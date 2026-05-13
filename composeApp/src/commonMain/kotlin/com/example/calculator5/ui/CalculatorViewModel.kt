@@ -108,14 +108,17 @@ class CalculatorViewModel(
     }
 
     fun saveCurrentResult() {
-        val r = _state.value.result ?: return
-        repository.saveResult(r)
-        viewModelScope.launch {
-            _state.update {
-                it.copy(history = repository.loadHistory(), savedHintVisible = true)
-            }
-        }
+    val r = _state.value.result ?: return
+
+    repository.saveResult(r)
+
+    _state.update {
+        it.copy(
+            history = repository.loadHistory(),
+            savedHintVisible = true
+        )
     }
+}
 
     fun clearHistory() {
         repository.clearHistory()
