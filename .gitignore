@@ -1,0 +1,19 @@
+.gradle/
+build/
+.idea/
+.kotlin/
+*.iml
+local.properties
+
+# Compose / KMP
+kotlin-js-store/
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Xcode
+xcuserdata/
+*.xcworkspace
+DerivedData/

@@ -1,0 +1,99 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+
+  android:
+    name: Android (APK)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v3
+      - name: Assemble debug APK
+        run: ./gradlew :composeApp:assembleDebug --no-daemon --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calculator5-android
+          path: composeApp/build/outputs/apk/debug/*.apk
+
+  desktop-linux:
+    name: Linux desktop (.deb / AppImage)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v3
+      - name: Package desktop distribution
+        run: ./gradlew :composeApp:packageDistributionForCurrentOS --no-daemon --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calculator5-linux
+          path: |
+            composeApp/build/compose/binaries/main/deb/*.deb
+            composeApp/build/compose/binaries/main/appimage/*.AppImage
+
+  web:
+    name: Web (wasmJs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v3
+      - name: Build wasmJs distribution
+        run: ./gradlew :composeApp:wasmJsBrowserDistribution --no-daemon --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calculator5-web
+          path: composeApp/build/dist/wasmJs/productionExecutable/
+
+  ios:
+    name: iOS framework
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v3
+      - name: Build iOS framework
+        run: ./gradlew :composeApp:linkPodReleaseFrameworkIosSimulatorArm64 --no-daemon --stacktrace || \
+             ./gradlew :composeApp:linkReleaseFrameworkIosSimulatorArm64 --no-daemon --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calculator5-ios-framework
+          path: composeApp/build/bin/iosSimulatorArm64/releaseFramework/
+
+  tests:
+    name: Tests (unit + UI + integration)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v3
+      - name: Run all common + desktop tests
+        run: ./gradlew :composeApp:desktopTest --no-daemon --stacktrace
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: composeApp/build/reports/tests/
