@@ -1,5 +1,4 @@
 package com.example.calculator5.data
 
-import kotlin.js.Date
-
-actual fun currentTimeMillis(): Long = Date.now().toLong()
+actual fun currentTimeMillis(): Long =
+    js("Date.now()").toString().toLong()
