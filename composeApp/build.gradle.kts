@@ -126,7 +126,21 @@ compose.desktop {
         mainClass = "com.example.calculator5.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.AppImage)
+
+            val os = org.gradle.internal.os.OperatingSystem.current()
+
+            targetFormats(
+                *when {
+                    os.isMacOsX -> arrayOf(TargetFormat.Dmg)
+                    os.isWindows -> arrayOf(TargetFormat.Msi)
+                    os.isLinux -> arrayOf(
+                        TargetFormat.Deb,
+                        TargetFormat.AppImage
+                    )
+                    else -> emptyArray()
+                }
+            )
+
             packageName = "com.example.calculator5"
             packageVersion = "1.0.0"
 
