@@ -3,6 +3,7 @@ package com.example.calculator5.data
 import com.example.calculator5.domain.Compounding
 import com.example.calculator5.domain.DepositInput
 import com.example.calculator5.domain.DepositResult
+import kotlinx.serialization.encodeToString
 import com.example.calculator5.i18n.Language
 import com.russhwolf.settings.Settings
 import kotlinx.serialization.Serializable
